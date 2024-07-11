@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Bridge Selector</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: black;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3.9em;
+            font-weight: bold;
+            margin-bottom: 0px;
+            margin-top: 5px;
+        }
+
+        .byline {
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            margin-top: 25px;
+            color: #636363;
+        }
+
+        h3 {
+            font-size: 1.9em;
+            margin-top: 7px;
+            margin-bottom: 55px;
+        }
+
+        label {
+            font-size: 1em;
+            font-weight: bold;
+            text-align: left;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dropdown-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            margin: 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dropdown select {
+            width: 200px;
+            background-color: black;
+            color: white;
+            border: 1px solid white;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .dropdown select:disabled {
+            background-color: gray;
+            color: darkgray;
+        }
+
+        button {
+            background-color: black;
+            color: white;
+            border: 1px solid white;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 45px;
+        }
+
+        button:hover {
+            background-color: #8B00FF;
+            color: white;
+        }
+
+        #your-path,
+        #results {
+            margin-top: 20px;
+            text-align: left;
+            width: 60%;
+        }
+
+        #your-path p,
+        #results ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #results li {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #results li:hover {
+            background-color: #8B00FF;
+            color: white;
+        }
+
+        #results li:hover a {
+            color: white;
+        }
+
+        a {
+            color: #8B00FF;
+            text-decoration: underline;
+        }
+
+        .results-header {
+            font-size: 1em;
+            font-weight: bold;
+            text-align: left;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .tight-spacing {
+            margin-bottom: 5px;
+        }
+
+        .nested {
+            margin-left: 5%;
+            width: 95%;
+        }
+
+        .erase-button {
+            background-color: black;
+            color: white;
+            border: 1px solid white;
+            padding: 5px 10px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-left: 10px;
+        }
+
+        .erase-button:hover {
+            background-color: #8B00FF;
+            color: white;
+        }
+
+        .warning {
+            color: orange;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        .left-align {
+            text-align: left;
+            width: 100%;
+        }
+
+        .left-align-container {
+            width: 60%;
+            text-align: left;
+        }
+
+        .reduced-margin {
+            margin-top: 10px;
+        }
+
+        .reduced-margin-bottom {
+            margin-bottom: 10px;
+        }
+
+        /* Additional styles for the new button and text */
+        #swap-button {
+            background-color: black;
+            color: orange;
+            border: 1px solid orange;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        #swap-button:hover {
+            background-color: orange;
+            color: white;
+        }
+
+        #swap-info {
+            color: white;
+            margin-top: 30px;
+        }
+
+        /* Media Queries for Mobile Devices */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+
+            .dropdown-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .dropdown {
+                margin: 5px 0;
+            }
+
+            button {
+                margin-top: 25px;
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            #your-path,
+            #results {
+                width: 90%;
+            }
+
+            .left-align-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="byline">For Mingo Premium by Mimika</div>
+    <h1>HYPERLANE</h1>
+    <h3>PATHFINDER</h3>
+    <form onsubmit="handleSubmit(event)">
+        <div class="dropdown-container">
+            <div class="dropdown">
+                <label for="bridge">Bridge</label>
+                <select id="bridge" name="bridge" onchange="updateTokenDropdown()" required>
+                    <option value="">select bridge</option>
+                    <option value="FORMA">FORMA</option>
+                    <option value="SKIP.GO">SKIP.GO</option>
+                    <option value="INEVM">INEVM</option>
+                    <option value="NAUTILUS">NAUTILUS</option>
+                    <option value="RENZO">RENZO</option>
+                    <option value="USENEXUS">USENEXUS</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <label for="token">Token</label>
+                <select id="token" name="token" onchange="updateSourceDropdown()" disabled>
+                    <option value="">select token</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <label for="sourceChain">Source Chain</label>
+                <select id="sourceChain" name="sourceChain" onchange="updateDestinationDropdown()" disabled>
+                    <option value="">select source chain</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <label for="destinationChain">Destination Chain</label>
+                <select id="destinationChain" name="destinationChain" disabled>
+                    <option value="">select destination chain</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="your-path" style="display: none;">
+        <div class="results-header">YOUR PATH:<button class="erase-button" onclick="erasePath()">Erase</button></div>
+    </div>
+    <div class="left-align-container">
+        <div id="results-header" class="results-header" style="display: none;">FURTHER POSSIBLE INTERACTIONS</div>
+    </div>
+    <div id="results" class="reduced-margin-bottom"></div>
+    <div id="swap-options" class="reduced-margin-bottom" style="display: none;"></div>
+    <div id="warning" style="display: none;">
+        <div class="results-header centered" style="color: white;">THE UNIQUENESS LIMIT HAS BEEN REACHED</div>
+        <div class="warning centered">To avoid creating a repeating loop, consider swapping your current token for a new asset.</div>
+    </div>
+
+    <!-- New button and information -->
+    <button id="swap-button" onclick="window.open('https://mimika-code.github.io/Hyper/swaps', '_blank')">Where to swap?</button>
+    <div id="swap-info">Click to see where you can swap between tokens that are compatible with the above bridges.</div>
+    <div class="byline">For Mingo Premium by Mimika</div>
+     
+
+    <script>
+        const bridgeOptions = {
+            "FORMA": {
+                url: "https://bridge.forma.art/",
+                tokens: ["TIA"],
+                interactions: [
+                    { source: "Celestia", token: "TIA", destination: "Forma" },
+                    { source: "Stride", token: "TIA", destination: "Forma" },
+                    { source: "Forma", token: "TIA", destination: "Stride" },
+                ]
+            },
+            "SKIP.GO": {
+                url: "https://go.skip.build/",
+                tokens: ["TIA", "TIA.n"],
+                interactions: [
+                    { source: "Neutron", token: "TIA.n", destination: "Arbitrum" },
+                    { source: "Neutron", token: "TIA.n", destination: "Manta Pacific" },
+                    { source: "Arbitrum", token: "TIA.n", destination: "Neutron" },
+                    { source: "Manta Pacific", token: "TIA.n", destination: "Neutron" },
+                    { source: "Stride", token: "TIA", destination: "Forma" },
+                    { source: "Forma", token: "TIA", destination: "Stride" },
+                ]
+            },
+            "INEVM": {
+                url: "https://bridge.inevm.com/",
+                tokens: ["INJ", "USDC", "USDT"],
+                interactions: [
+                    { source: "Injective", token: "INJ", destination: "inEVM" },
+                    { source: "inEVM", token: "INJ", destination: "Injective" },
+                    { source: "inEVM", token: "USDC", destination: "Ethereum" },
+                    { source: "inEVM", token: "USDT", destination: "Ethereum" },
+                    { source: "Ethereum", token: "USDC", destination: "inEVM" },
+                    { source: "Ethereum", token: "USDT", destination: "inEVM" },
+                ]
+            },
+            "NAUTILUS": {
+                url: "https://www.nautilusbridge.com/",
+                tokens: ["BTCB", "ETH", "POSE", "USDC", "USDT", "ZBC"],
+                interactions: [
+                    { source: "Nautilus", token: "USDT", destination: "Binance" },
+                    { source: "Nautilus", token: "USDC", destination: "Binance" },
+                    { source: "Nautilus", token: "ETH", destination: "Binance" },
+                    { source: "Nautilus", token: "ZBC", destination: "Binance" },
+                    { source: "Nautilus", token: "BTCB", destination: "Binance" },
+                    { source: "Nautilus", token: "POSE", destination: "Binance" },
+                    { source: "Nautilus", token: "ZBC", destination: "Solana" },
+                    { source: "Binance", token: "USDT", destination: "Nautilus" },
+                    { source: "Binance", token: "USDC", destination: "Nautilus" },
+                    { source: "Binance", token: "ETH", destination: "Nautilus" },
+                    { source: "Binance", token: "ZBC", destination: "Nautilus" },
+                    { source: "Binance", token: "BTCB", destination: "Nautilus" },
+                    { source: "Binance", token: "POSE", destination: "Nautilus" },
+                    { source: "Binance", token: "ZBC", destination: "Solana" },
+                    { source: "Solana", token: "ZBC", destination: "Nautilus" },
+                    { source: "Solana", token: "ZBC", destination: "Binance" },
+                ]
+            },
+            "RENZO": {
+                url: "https://renzo.hyperlane.xyz/",
+                tokens: ["ezETH"],
+                interactions: [
+                    { source: "Blast", token: "ezETH", destination: "Binance" },
+                    { source: "Blast", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Blast", token: "ezETH", destination: "Optimism" },
+                    { source: "Blast", token: "ezETH", destination: "Base" },
+                    { source: "Blast", token: "ezETH", destination: "Mode" },
+                    { source: "Blast", token: "ezETH", destination: "Linea" },
+                    { source: "Blast", token: "ezETH", destination: "Ethereum" },
+                    { source: "Binance", token: "ezETH", destination: "Blast" },
+                    { source: "Binance", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Binance", token: "ezETH", destination: "Optimism" },
+                    { source: "Binance", token: "ezETH", destination: "Base" },
+                    { source: "Binance", token: "ezETH", destination: "Mode" },
+                    { source: "Binance", token: "ezETH", destination: "Linea" },
+                    { source: "Binance", token: "ezETH", destination: "Ethereum" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Blast" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Binance" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Optimism" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Base" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Mode" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Linea" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Ethereum" },
+                    { source: "Optimism", token: "ezETH", destination: "Blast" },
+                    { source: "Optimism", token: "ezETH", destination: "Binance" },
+                    { source: "Optimism", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Optimism", token: "ezETH", destination: "Base" },
+                    { source: "Optimism", token: "ezETH", destination: "Mode" },
+                    { source: "Optimism", token: "ezETH", destination: "Linea" },
+                    { source: "Optimism", token: "ezETH", destination: "Ethereum" },
+                    { source: "Base", token: "ezETH", destination: "Blast" },
+                    { source: "Base", token: "ezETH", destination: "Binance" },
+                    { source: "Base", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Base", token: "ezETH", destination: "Optimism" },
+                    { source: "Base", token: "ezETH", destination: "Mode" },
+                    { source: "Base", token: "ezETH", destination: "Linea" },
+                    { source: "Base", token: "ezETH", destination: "Ethereum" },
+                    { source: "Mode", token: "ezETH", destination: "Blast" },
+                    { source: "Mode", token: "ezETH", destination: "Binance" },
+                    { source: "Mode", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Mode", token: "ezETH", destination: "Optimism" },
+                    { source: "Mode", token: "ezETH", destination: "Base" },
+                    { source: "Mode", token: "ezETH", destination: "Linea" },
+                    { source: "Mode", token: "ezETH", destination: "Ethereum" },
+                    { source: "Linea", token: "ezETH", destination: "Blast" },
+                    { source: "Linea", token: "ezETH", destination: "Binance" },
+                    { source: "Linea", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Linea", token: "ezETH", destination: "Optimism" },
+                    { source: "Linea", token: "ezETH", destination: "Base" },
+                    { source: "Linea", token: "ezETH", destination: "Mode" },
+                    { source: "Linea", token: "ezETH", destination: "Ethereum" },
+                    { source: "Ethereum", token: "ezETH", destination: "Blast" },
+                    { source: "Ethereum", token: "ezETH", destination: "Binance" },
+                    { source: "Ethereum", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Ethereum", token: "ezETH", destination: "Optimism" },
+                    { source: "Ethereum", token: "ezETH", destination: "Base" },
+                    { source: "Ethereum", token: "ezETH", destination: "Mode" },
+                    { source: "Ethereum", token: "ezETH", destination: "Linea" },
+                ]
+            },
+            "USENEXUS": {
+                url: "https://www.usenexus.org/",
+                tokens: ["ECLIP", "ETH", "INJ", "TIA.n", "USDC", "USDT"],
+                interactions: [
+                    { source: "Celestia", token: "TIA.n", destination: "Neutron" },
+                    { source: "Celestia", token: "TIA.n", destination: "Arbitrum" },
+                    { source: "Celestia", token: "TIA.n", destination: "Manta Pacific" },
+                    { source: "Neutron", token: "TIA.n", destination: "Celestia" },
+                    { source: "Neutron", token: "TIA.n", destination: "Manta Pacific" },
+                    { source: "Neutron", token: "TIA.n", destination: "Arbitrum" },
+                    { source: "Neutron", token: "ECLIP", destination: "Arbitrum" },
+                    { source: "Arbitrum", token: "TIA.n", destination: "Neutron" },
+                    { source: "Arbitrum", token: "ECLIP", destination: "Neutron" },
+                    { source: "Manta Pacific", token: "TIA.n", destination: "Neutron" },
+                    { source: "Injective", token: "INJ", destination: "inEVM" },
+                    { source: "inEVM", token: "INJ", destination: "Injective" },
+                    { source: "inEVM", token: "USDC", destination: "Ethereum" },
+                    { source: "inEVM", token: "USDT", destination: "Ethereum" },
+                    { source: "Ethereum", token: "USDC", destination: "inEVM" },
+                    { source: "Ethereum", token: "USDT", destination: "inEVM" },
+                    { source: "Ethereum", token: "USDC", destination: "Ancient8" },
+                    { source: "Ethereum", token: "USDC", destination: "Viction" },
+                    { source: "Ethereum", token: "USDT", destination: "Viction" },
+                    { source: "Ethereum", token: "ETH", destination: "Viction" },
+                    { source: "Viction", token: "USDC", destination: "Ethereum" },
+                    { source: "Viction", token: "USDT", destination: "Ethereum" },
+                    { source: "Viction", token: "ETH", destination: "Ethereum" },
+                    { source: "Ancient8", token: "USDC", destination: "Ethereum" },
+                ]
+            }
+        };
+
+        const swapOptions = {
+            "Arbitrum": {
+                "TIA.n": [
+                    { to: "ECLIP", via: ["Rabby Wallet", "Jumper", "1inch", "Paraswap", "TraderJoe"] },
+                    { to: "ezETH", via: ["Rabby Wallet", "Jumper", "1inch", "Paraswap"] }
+                ],
+                "ECLIP": [
+                    { to: "TIA.n", via: ["Rabby Wallet", "Jumper", "1inch", "Paraswap"] },
+                    { to: "ezETH", via: ["Rabby Wallet", "Jumper", "1inch", "Paraswap", "TraderJoe"] }
+                ]
+            }
+        };
+
+        let selectedPath = [];
+
+        function updateTokenDropdown() {
+            const bridge = document.getElementById('bridge').value;
+            const tokenSelect = document.getElementById('token');
+            const sourceChainSelect = document.getElementById('sourceChain');
+            const destinationChainSelect = document.getElementById('destinationChain');
+
+            tokenSelect.disabled = true;
+            sourceChainSelect.disabled = true;
+            destinationChainSelect.disabled = true;
+
+            tokenSelect.innerHTML = '<option value="">select token</option>';
+            sourceChainSelect.innerHTML = '<option value="">select source chain</option>';
+            destinationChainSelect.innerHTML = '<option value="">select destination chain</option>';
+
+            if (bridgeOptions[bridge]) {
+                bridgeOptions[bridge].tokens.sort().forEach(token => {
+                    const option = document.createElement('option');
+                    option.value = token;
+                    option.textContent = token;
+                    tokenSelect.appendChild(option);
+                });
+
+                tokenSelect.disabled = false;
+            }
+        }
+
+        function updateSourceDropdown() {
+            const bridge = document.getElementById('bridge').value;
+            const token = document.getElementById('token').value;
+            const sourceChainSelect = document.getElementById('sourceChain');
+            const destinationChainSelect = document.getElementById('destinationChain');
+
+            sourceChainSelect.disabled = true;
+            destinationChainSelect.disabled = true;
+
+            sourceChainSelect.innerHTML = '<option value="">select source chain</option>';
+            destinationChainSelect.innerHTML = '<option value="">select destination chain</option>';
+
+            if (bridgeOptions[bridge] && token) {
+                const validSourceChains = new Set();
+                bridgeOptions[bridge].interactions.forEach(interaction => {
+                    if (interaction.token === token) {
+                        validSourceChains.add(interaction.source);
+                    }
+                });
+
+                Array.from(validSourceChains).sort().forEach(chain => {
+                    const option = document.createElement('option');
+                    option.value = chain;
+                    option.textContent = chain;
+                    sourceChainSelect.appendChild(option);
+                });
+
+                sourceChainSelect.disabled = false;
+            }
+        }
+
+        function updateDestinationDropdown() {
+            const bridge = document.getElementById('bridge').value;
+            const token = document.getElementById('token').value;
+            const sourceChain = document.getElementById('sourceChain').value;
+            const destinationChainSelect = document.getElementById('destinationChain');
+
+            destinationChainSelect.disabled = true;
+
+            destinationChainSelect.innerHTML = '<option value="">select destination chain</option>';
+
+            if (bridgeOptions[bridge] && token && sourceChain) {
+                const validDestinationChains = new Set();
+                bridgeOptions[bridge].interactions.forEach(interaction => {
+                    if (interaction.token === token && interaction.source === sourceChain) {
+                        validDestinationChains.add(interaction.destination);
+                    }
+                });
+
+                Array.from(validDestinationChains).sort().forEach(chain => {
+                    const option = document.createElement('option');
+                    option.value = chain;
+                    option.textContent = chain;
+                    destinationChainSelect.appendChild(option);
+                });
+
+                destinationChainSelect.disabled = false;
+            }
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            const bridge = document.getElementById('bridge').value;
+            const token = document.getElementById('token').value;
+            const sourceChain = document.getElementById('sourceChain').value;
+            const destinationChain = document.getElementById('destinationChain').value;
+
+            const yourPathDiv = document.getElementById('your-path');
+            const resultsDiv = document.getElementById('results');
+            const resultsHeader = document.getElementById('results-header');
+            const warningDiv = document.getElementById('warning');
+            const swapOptionsDiv = document.getElementById('swap-options');
+
+            if (bridge && token && sourceChain && destinationChain) {
+                const path = `<a href="${bridgeOptions[bridge].url}" target="_blank">${bridge} BRIDGE</a>: ${sourceChain} (${token}) -> ${destinationChain} (${token})`;
+                const pathElement = document.createElement('p');
+                pathElement.innerHTML = path;
+                yourPathDiv.appendChild(pathElement);
+                selectedPath.push({ bridge, token, sourceChain, destinationChain });
+
+                yourPathDiv.style.display = 'block';
+                resultsHeader.style.display = 'block';
+
+                showFurtherInteractions(destinationChain, token, selectedPath[0].sourceChain);
+            }
+        }
+
+        function showFurtherInteractions(destinationChain, token, initialSourceChain) {
+            const resultsDiv = document.getElementById('results');
+            const resultsHeader = document.getElementById('results-header');
+            const warningDiv = document.getElementById('warning');
+            resultsDiv.innerHTML = '';
+            resultsHeader.style.display = 'none';
+            warningDiv.style.display = 'none';
+
+            const possibleInteractions = [];
+            const returnToSourceInteractions = [];
+
+            Object.keys(bridgeOptions).forEach(bridge => {
+                bridgeOptions[bridge].interactions.forEach(interaction => {
+                    if (interaction.token === token && interaction.source === destinationChain && !isPathSelected(interaction.source, interaction.destination)) {
+                        if (interaction.destination === initialSourceChain) {
+                            returnToSourceInteractions.push({
+                                display: `<a href="${bridgeOptions[bridge].url}" target="_blank">${bridge} BRIDGE</a>: ${interaction.source} (${interaction.token}) -> ${interaction.destination} (${interaction.token})`,
+                                interaction: interaction,
+                                bridge: bridge
+                            });
+                        } else {
+                            possibleInteractions.push({
+                                display: `<a href="${bridgeOptions[bridge].url}" target="_blank">${bridge} BRIDGE</a>: ${interaction.source} (${interaction.token}) -> ${interaction.destination} (${interaction.token})`,
+                                interaction: interaction,
+                                bridge: bridge
+                            });
+                        }
+                    }
+
+                    // Check for TIA.n to TIA transition
+                    if (interaction.token === "TIA" && interaction.source === "Celestia" && token === "TIA.n" && destinationChain === "Celestia") {
+                        possibleInteractions.push({
+                            display: `<a href="${bridgeOptions[bridge].url}" target="_blank">${bridge} BRIDGE</a>: ${interaction.source} (${interaction.token}) -> ${interaction.destination} (${interaction.token})`,
+                            interaction: interaction,
+                            bridge: bridge
+                        });
+                    }
+                });
+            });
+
+            if (possibleInteractions.length > 0 || returnToSourceInteractions.length > 0) {
+                resultsHeader.style.display = 'block';
+                const ul = document.createElement('ul');
+                possibleInteractions.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = item.display;
+                    li.addEventListener('click', () => handleInteractionClick(item, index, li));
+                    ul.appendChild(li);
+                });
+
+                if (returnToSourceInteractions.length > 0) {
+                    const returnHeader = document.createElement('div');
+                    returnHeader.classList.add('results-header');
+                    returnHeader.textContent = 'Return to source network';
+                    ul.appendChild(returnHeader);
+
+                    returnToSourceInteractions.forEach((item, index) => {
+                        const li = document.createElement('li');
+                        li.innerHTML = item.display;
+                        li.addEventListener('click', () => handleInteractionClick(item, index, li));
+                        ul.appendChild(li);
+                    });
+                }
+
+                resultsDiv.appendChild(ul);
+            } else {
+                warningDiv.style.display = 'block';
+            }
+        }
+
+        function handleInteractionClick(selectedInteraction, selectedIndex, selectedElement) {
+            const yourPathDiv = document.getElementById('your-path');
+            const selectedPathDiv = document.createElement('p');
+            selectedPathDiv.innerHTML = `<a href="${bridgeOptions[selectedInteraction.bridge].url}" target="_blank">${selectedInteraction.bridge} BRIDGE</a>: ${selectedInteraction.interaction.source} (${selectedInteraction.interaction.token}) -> ${selectedInteraction.interaction.destination} (${selectedInteraction.interaction.token})`;
+            yourPathDiv.appendChild(selectedPathDiv);
+
+            selectedPath.push({
+                bridge: selectedInteraction.bridge,
+                token: selectedInteraction.interaction.token,
+                sourceChain: selectedInteraction.interaction.source,
+                destinationChain: selectedInteraction.interaction.destination
+            });
+
+            showFurtherInteractions(selectedInteraction.interaction.destination, selectedInteraction.interaction.token, selectedPath[0].sourceChain);
+        }
+
+        function isPathSelected(source, destination) {
+            return selectedPath.some(path => path.sourceChain === source && path.destinationChain === destination);
+        }
+
+        function erasePath() {
+            location.reload();
+        }
+
+        window.onload = () => {
+            const tokenSelect = document.getElementById('token');
+            const sourceChainSelect = document.getElementById('sourceChain');
+            const destinationChainSelect = document.getElementById('destinationChain');
+            tokenSelect.disabled = true;
+            sourceChainSelect.disabled = true;
+            destinationChainSelect.disabled = true;
+        };
+    </script>
+</body>
+
+</html>

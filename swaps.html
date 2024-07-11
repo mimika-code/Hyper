@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Bridge Selector</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: black;
+            color: white;
+        }
+
+        h1 {
+            font-size: 1.42875em;
+            font-weight: bold;
+            margin-bottom: 45px;
+        }
+
+        .byline {
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            margin-top: 25px;
+            color: #636363;
+        }
+
+        label {
+            font-size: 1em;
+            font-weight: bold;
+            text-align: left;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dropdown-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            margin: 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .dropdown select {
+            width: 200px;
+            background-color: black;
+            color: white;
+            border: 1px solid white;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .dropdown select:disabled {
+            background-color: gray;
+            color: darkgray;
+        }
+
+        button {
+            background-color: black;
+            color: white;
+            border: 1px solid white;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 45px;
+        }
+
+        button:hover {
+            background-color: #8B00FF;
+            color: white;
+        }
+
+        #results {
+            margin-top: 20px;
+            text-align: center;
+            width: 60%;
+        }
+
+        .results-header {
+            font-size: 1em;
+            font-weight: bold;
+            text-align: left;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .tight-spacing {
+            margin-bottom: 5px;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        .left-align {
+            text-align: left;
+            width: 100%;
+        }
+
+        .left-align-container {
+            width: 60%;
+            text-align: left;
+        }
+
+        .reduced-margin {
+            margin-top: 10px;
+        }
+
+        .reduced-margin-bottom {
+            margin-bottom: 10px;
+        }
+
+        .orange-link {
+            color: orange;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* Additional styles for the new button */
+        #close-button {
+            background-color: black;
+            color: orange;
+            border: 1px solid orange;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        #close-button:hover {
+            background-color: orange;
+            color: white;
+        }
+
+        /* Media Queries for Mobile Devices */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.2em;
+            }
+
+            .dropdown-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .dropdown {
+                margin: 5px 0;
+            }
+
+            button {
+                margin-top: 25px;
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            #results,
+            .left-align-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>WHERE TO SWAP?</h1>
+    <form>
+        <div class="dropdown-container">
+            <div class="dropdown">
+                <label for="chain">Chain</label>
+                <select id="chain" name="chain" onchange="updateTokenDropdown()" required>
+                    <option value="">select chain</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <label for="token">Token</label>
+                <select id="token" name="token" onchange="updateSwapDropdown()" disabled>
+                    <option value="">select token</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <label for="swap">Swap to</label>
+                <select id="swap" name="swap" onchange="showResults()" disabled>
+                    <option value="">select swap</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <div id="results" class="reduced-margin-bottom"></div>
+
+    <!-- New button -->
+    <button id="close-button" onclick="window.close('https://mimika-code.github.io/Hyper', '_blank')">Close This Page</button>
+    <div class="byline">For Mingo Premium by Mimika</div>
+
+    <script>
+        const swapOptions = {
+            "Celestia": {
+                "TIA": {
+                    "INJ": [
+                        { name: "Keplr Wallet", url: "https://www.keplr.app/" }
+                    ]
+                }
+            },
+            "Neutron": {
+                "TIA": {
+                    "INJ": [
+                        { name: "Keplr Wallet", url: "https://www.keplr.app/" }
+                    ],
+                    "ECLIP": [
+                        { name: "Astroport", url: "https://app.astroport.fi/" }
+                    ]
+                },
+                "ECLIP": {
+                    "TIA": [
+                        { name: "Astroport", url: "https://app.astroport.fi/" }
+                    ]
+                }
+            },
+            "Arbitrum": {
+                "TIA.n": {
+                    "ECLIP": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" },
+                        { name: "TraderJoe", url: "https://traderjoexyz.com/arbitrum/trade" }
+                    ]
+                },
+                "ezETH": {
+                    "TIA.n": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" },
+                        { name: "TraderJoe", url: "https://traderjoexyz.com/arbitrum/trade" }
+                    ],
+                    "ECLIP": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "ECLIP": {
+                    "TIA.n": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                }
+            },
+            "Manta Pacific": {
+                "TIA.n": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Injective": {
+                "INJ": {
+                    "TIA": [
+                        { name: "Keplr Wallet", url: "https://www.keplr.app/" }
+                    ]
+                }
+            },
+            "inEVM": {
+                "INJ": {
+                    "USDC": [
+                        { name: "Dackie Swap", url: "https://www.dackieswap.xyz/swap?chain=inEvm" },
+                        { name: "Poolshark", url: "https://dapp.poolshark.fi" }
+                    ],
+                    "USDT": [
+                        { name: "Dackie Swap", url: "https://www.dackieswap.xyz/swap?chain=inEvm" },
+                        { name: "Poolshark", url: "https://dapp.poolshark.fi" }
+                    ]
+                },
+                "USDC": {
+                    "INJ": [
+                        { name: "Dackie Swap", url: "https://www.dackieswap.xyz/swap?chain=inEvm" },
+                        { name: "Poolshark", url: "https://dapp.poolshark.fi" }
+                    ],
+                    "USDT": [
+                        { name: "Dackie Swap", url: "https://www.dackieswap.xyz/swap?chain=inEvm" },
+                        { name: "Poolshark", url: "https://dapp.poolshark.fi" },
+                        { name: "Meson", url: "https://meson.fi/" }
+                    ]
+                },
+                "USDT": {
+                    "INJ": [
+                        { name: "Dackie Swap", url: "https://www.dackieswap.xyz/swap?chain=inEvm" },
+                        { name: "Poolshark", url: "https://dapp.poolshark.fi" }
+                    ],
+                    "USDC": [
+                        { name: "Dackie Swap", url: "https://www.dackieswap.xyz/swap?chain=inEvm" },
+                        { name: "Poolshark", url: "https://dapp.poolshark.fi" },
+                        { name: "Meson", url: "https://meson.fi/" }
+                    ]
+                }
+            },
+            "Ethereum": {
+                "USDC": {
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "USDT": {
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "ETH": {
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "ezETH": {
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                }
+            },
+            "Ancient8": {
+                "USDC": {
+                    "info": "Swap on <a href='https://www.baryon.network/swap?chain=ancient8Mainnet' target='_blank' class='orange-link'>Byron</a> and bridge to Ethereum on <a href='https://www.relay.link/bridge/ethereum' target='_blank' class='orange-link'>Relay</a>"
+                }
+            },
+            "Viction": {
+                "USDC": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                },
+                "USDT": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                },
+                "ETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Forma": {
+                "TIA": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Stride": {
+                "TIA": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Nautilus": {
+                "USDT": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable. Consider bridging via <a href='https://meson.fi/' target='_blank' class='orange-link'>Meson</a> or continue on the return path."
+                },
+                "USDC": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable. Consider bridging via <a href='https://meson.fi/' target='_blank' class='orange-link'>Meson</a> or continue on the return path."
+                },
+                "ETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable. Consider bridging via <a href='https://meson.fi/' target='_blank' class='orange-link'>Meson</a> or continue on the return path."
+                },
+                "ZBC": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable. Consider bridging via <a href='https://meson.fi/' target='_blank' class='orange-link'>Meson</a> or continue on the return path."
+                },
+                "BTCB": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable. Consider bridging via <a href='https://meson.fi/' target='_blank' class='orange-link'>Meson</a> or continue on the return path."
+                },
+                "POSE": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable. Consider bridging via <a href='https://meson.fi/' target='_blank' class='orange-link'>Meson</a> or continue on the return path."
+                }
+            },
+            "Binance": {
+                "USDC": {
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ZBC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "BTCB": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "POSE": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "USDT": {
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ZBC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "BTCB": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "POSE": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "ETH": {
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ZBC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "BTCB": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "POSE": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "ZBC": {
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "BTCB": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "POSE": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "BTCB": {
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ZBC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "POSE": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                },
+                "POSE": {
+                    "USDC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "USDT": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ZBC": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "BTCB": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ],
+                    "ezETH": [
+                        { name: "Rabby Wallet", url: "https://rabby.io/" },
+                        { name: "Jumper", url: "https://jumper.exchange/" },
+                        { name: "1inch", url: "https://app.1inch.io/" },
+                        { name: "Paraswap", url: "https://app.paraswap.io/" }
+                    ]
+                }
+            },
+            "Solana": {
+                "ZBC": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Blast": {
+                "ezETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Optimism": {
+                "ezETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Base": {
+                "ezETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Mode": {
+                "ezETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            },
+            "Linea": {
+                "ezETH": {
+                    "info": "Exchange to a token compatible with the above bridges is unavailable."
+                }
+            }
+        };
+
+        const chains = Object.keys(swapOptions);
+
+        window.onload = () => {
+            const chainSelect = document.getElementById('chain');
+            chains.forEach(chain => {
+                const option = document.createElement('option');
+                option.value = chain;
+                option.textContent = chain;
+                chainSelect.appendChild(option);
+            });
+        };
+
+        function updateTokenDropdown() {
+            const chain = document.getElementById('chain').value;
+            const tokenSelect = document.getElementById('token');
+            const swapSelect = document.getElementById('swap');
+            const resultsDiv = document.getElementById('results');
+
+            tokenSelect.disabled = true;
+            swapSelect.disabled = true;
+            resultsDiv.innerHTML = '';
+
+            tokenSelect.innerHTML = '<option value="">select token</option>';
+            swapSelect.innerHTML = '<option value="">select swap</option>';
+
+            if (swapOptions[chain]) {
+                const tokens = Object.keys(swapOptions[chain]);
+                tokens.forEach(token => {
+                    const option = document.createElement('option');
+                    option.value = token;
+                    option.textContent = token;
+                    tokenSelect.appendChild(option);
+                });
+
+                tokenSelect.disabled = false;
+            }
+        }
+
+        function updateSwapDropdown() {
+            const chain = document.getElementById('chain').value;
+            const token = document.getElementById('token').value;
+            const swapSelect = document.getElementById('swap');
+            const resultsDiv = document.getElementById('results');
+
+            swapSelect.disabled = true;
+            resultsDiv.innerHTML = '';
+
+            swapSelect.innerHTML = '<option value="">select swap</option>';
+
+            if (swapOptions[chain] && swapOptions[chain][token]) {
+                if (swapOptions[chain][token].info) {
+                    resultsDiv.innerHTML = swapOptions[chain][token].info;
+                    resultsDiv.style.textAlign = 'center';
+                    return;
+                }
+
+                const swaps = Object.keys(swapOptions[chain][token]);
+                swaps.forEach(swap => {
+                    const option = document.createElement('option');
+                    option.value = swap;
+                    option.textContent = swap;
+                    swapSelect.appendChild(option);
+                });
+
+                swapSelect.disabled = false;
+            }
+        }
+
+        function showResults() {
+            const chain = document.getElementById('chain').value;
+            const token = document.getElementById('token').value;
+            const swap = document.getElementById('swap').value;
+            const resultsDiv = document.getElementById('results');
+
+            resultsDiv.innerHTML = '';
+
+            if (swapOptions[chain] && swapOptions[chain][token] && swapOptions[chain][token][swap]) {
+                const results = swapOptions[chain][token][swap];
+                resultsDiv.style.textAlign = 'center';
+                const resultLinks = results.map(result => {
+                    return `<a href="${result.url}" target="_blank" class="orange-link">${result.name}</a>`;
+                }).join(' / ');
+                resultsDiv.innerHTML = resultLinks;
+            }
+        }
+    </script>
+</body>
+</html>
