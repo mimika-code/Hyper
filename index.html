@@ -252,7 +252,7 @@
 
 <body>
     <div class="byline">For Mingo Premium by Mimika</div>
-    <h1>HYPERLANE</h1>
+    <h1>HYPERLANE</h3>
     <h3>PATHFINDER</h3>
     <form onsubmit="handleSubmit(event)">
         <div class="dropdown-container">
@@ -306,7 +306,6 @@
     <button id="swap-button" onclick="window.open('https://mimika-code.github.io/Hyper/swaps', '_blank')">Where to swap?</button>
     <div id="swap-info">Click to see where you can swap between tokens that are compatible with the above bridges.</div>
     <div class="byline">For Mingo Premium by Mimika</div>
-     
 
     <script>
         const bridgeOptions = {
@@ -644,8 +643,8 @@
                 });
             });
 
-            // inf
-            if (destinationChain === "Stride" && token === "TIA") {
+            // Ddd
+            if (destinationChain === "Stride" && token === "TIA" && !isPathSelected("Stride", "Celestia")) {
                 const additionalInteraction = {
                     display: `<a href="https://app.stride.zone/" target="_blank">STRIDE WITHDRAWAL</a>: Stride (TIA) -> Celestia (TIA) / Info: Connect your wallet (e.g., Keplr) and below your wallet account balance, you will see the underlined text "Withdraw from Stride" - click on this text. Accept the withdrawal -> you will not have the option to choose the amount or network, which means all your TIA tokens will be withdrawn to Celestia.`,
                     interaction: {
@@ -655,9 +654,7 @@
                     },
                     bridge: "STRIDE WITHDRAWAL"
                 };
-                if (!possibleInteractions.some(interaction => interaction.display === additionalInteraction.display)) {
-                    possibleInteractions.push(additionalInteraction);
-                }
+                possibleInteractions.push(additionalInteraction);
             }
 
             if (possibleInteractions.length > 0 || returnToSourceInteractions.length > 0) {
