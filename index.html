@@ -376,6 +376,7 @@
                     { source: "Blast", token: "ezETH", destination: "Mode" },
                     { source: "Blast", token: "ezETH", destination: "Linea" },
                     { source: "Blast", token: "ezETH", destination: "Ethereum" },
+                    { source: "Blast", token: "ezETH", destination: "Fraxtal" },
                     { source: "Binance", token: "ezETH", destination: "Blast" },
                     { source: "Binance", token: "ezETH", destination: "Arbitrum" },
                     { source: "Binance", token: "ezETH", destination: "Optimism" },
@@ -383,6 +384,7 @@
                     { source: "Binance", token: "ezETH", destination: "Mode" },
                     { source: "Binance", token: "ezETH", destination: "Linea" },
                     { source: "Binance", token: "ezETH", destination: "Ethereum" },
+                    { source: "Binance", token: "ezETH", destination: "Fraxtal" },
                     { source: "Arbitrum", token: "ezETH", destination: "Blast" },
                     { source: "Arbitrum", token: "ezETH", destination: "Binance" },
                     { source: "Arbitrum", token: "ezETH", destination: "Optimism" },
@@ -390,6 +392,7 @@
                     { source: "Arbitrum", token: "ezETH", destination: "Mode" },
                     { source: "Arbitrum", token: "ezETH", destination: "Linea" },
                     { source: "Arbitrum", token: "ezETH", destination: "Ethereum" },
+                    { source: "Arbitrum", token: "ezETH", destination: "Fraxtal" },
                     { source: "Optimism", token: "ezETH", destination: "Blast" },
                     { source: "Optimism", token: "ezETH", destination: "Binance" },
                     { source: "Optimism", token: "ezETH", destination: "Arbitrum" },
@@ -397,6 +400,7 @@
                     { source: "Optimism", token: "ezETH", destination: "Mode" },
                     { source: "Optimism", token: "ezETH", destination: "Linea" },
                     { source: "Optimism", token: "ezETH", destination: "Ethereum" },
+                    { source: "Optimism", token: "ezETH", destination: "Fraxtal" },
                     { source: "Base", token: "ezETH", destination: "Blast" },
                     { source: "Base", token: "ezETH", destination: "Binance" },
                     { source: "Base", token: "ezETH", destination: "Arbitrum" },
@@ -404,6 +408,7 @@
                     { source: "Base", token: "ezETH", destination: "Mode" },
                     { source: "Base", token: "ezETH", destination: "Linea" },
                     { source: "Base", token: "ezETH", destination: "Ethereum" },
+                    { source: "Base", token: "ezETH", destination: "Fraxtal" },
                     { source: "Mode", token: "ezETH", destination: "Blast" },
                     { source: "Mode", token: "ezETH", destination: "Binance" },
                     { source: "Mode", token: "ezETH", destination: "Arbitrum" },
@@ -411,6 +416,7 @@
                     { source: "Mode", token: "ezETH", destination: "Base" },
                     { source: "Mode", token: "ezETH", destination: "Linea" },
                     { source: "Mode", token: "ezETH", destination: "Ethereum" },
+                    { source: "Mode", token: "ezETH", destination: "Fraxtal" },
                     { source: "Linea", token: "ezETH", destination: "Blast" },
                     { source: "Linea", token: "ezETH", destination: "Binance" },
                     { source: "Linea", token: "ezETH", destination: "Arbitrum" },
@@ -418,6 +424,7 @@
                     { source: "Linea", token: "ezETH", destination: "Base" },
                     { source: "Linea", token: "ezETH", destination: "Mode" },
                     { source: "Linea", token: "ezETH", destination: "Ethereum" },
+                    { source: "Linea", token: "ezETH", destination: "Fraxtal" },
                     { source: "Ethereum", token: "ezETH", destination: "Blast" },
                     { source: "Ethereum", token: "ezETH", destination: "Binance" },
                     { source: "Ethereum", token: "ezETH", destination: "Arbitrum" },
@@ -425,6 +432,15 @@
                     { source: "Ethereum", token: "ezETH", destination: "Base" },
                     { source: "Ethereum", token: "ezETH", destination: "Mode" },
                     { source: "Ethereum", token: "ezETH", destination: "Linea" },
+                    { source: "Ethereum", token: "ezETH", destination: "Fraxtal" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Blast" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Binance" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Arbitrum" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Optimism" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Base" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Mode" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Linea" },
+                    { source: "Fraxtal", token: "ezETH", destination: "Ethereum" },
                 ]
             },
             "USENEXUS": {
@@ -628,13 +644,33 @@
                 });
             });
 
+            // Dodanie dodatkowej propozycji dla specyficznej ścieżki
+            if (initialSourceChain === "Forma" && destinationChain === "Stride" && token === "TIA") {
+                const additionalInteraction = {
+                    display: `<a href="https://app.stride.zone/" target="_blank">STRIDE WITHDRAWAL</a>: Stride (TIA) -> Celestia (TIA) / Info: Connect your wallet (e.g., Keplr) and below your wallet account balance, you will see the underlined text "Withdraw from Stride" - click on this text. Accept the withdrawal -> you will not have the option to choose the amount or network, which means all your TIA tokens will be withdrawn to Celestia.`,
+                    interaction: {
+                        source: "Stride",
+                        destination: "Celestia",
+                        token: "TIA"
+                    },
+                    bridge: "STRIDE WITHDRAWAL"
+                };
+                possibleInteractions.push(additionalInteraction);
+            }
+
             if (possibleInteractions.length > 0 || returnToSourceInteractions.length > 0) {
                 resultsHeader.style.display = 'block';
                 const ul = document.createElement('ul');
                 possibleInteractions.forEach((item, index) => {
                     const li = document.createElement('li');
                     li.innerHTML = item.display;
-                    li.addEventListener('click', () => handleInteractionClick(item, index, li));
+                    li.addEventListener('click', () => {
+                        if (item.bridge === "STRIDE WITHDRAWAL") {
+                            handleStrideWithdrawalClick(item, index, li);
+                        } else {
+                            handleInteractionClick(item, index, li);
+                        }
+                    });
                     ul.appendChild(li);
                 });
 
@@ -656,6 +692,22 @@
             } else {
                 warningDiv.style.display = 'block';
             }
+        }
+
+        function handleStrideWithdrawalClick(selectedInteraction, selectedIndex, selectedElement) {
+            const yourPathDiv = document.getElementById('your-path');
+            const selectedPathDiv = document.createElement('p');
+            selectedPathDiv.innerHTML = `<a href="https://app.stride.zone/" target="_blank">STRIDE WITHDRAWAL</a>: ${selectedInteraction.interaction.source} (${selectedInteraction.interaction.token}) -> ${selectedInteraction.interaction.destination} (${selectedInteraction.interaction.token}) / Info: Connect your wallet (e.g., Keplr) and below your wallet account balance, you will see the underlined text "Withdraw from Stride" - click on this text. Accept the withdrawal -> you will not have the option to choose the amount or network, which means all your TIA tokens will be withdrawn to Celestia.`;
+            yourPathDiv.appendChild(selectedPathDiv);
+
+            selectedPath.push({
+                bridge: selectedInteraction.bridge,
+                token: selectedInteraction.interaction.token,
+                sourceChain: selectedInteraction.interaction.source,
+                destinationChain: selectedInteraction.interaction.destination
+            });
+
+            showFurtherInteractions("Celestia", "TIA", selectedPath[0].sourceChain);
         }
 
         function handleInteractionClick(selectedInteraction, selectedIndex, selectedElement) {
